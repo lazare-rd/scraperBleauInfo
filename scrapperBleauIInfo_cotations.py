@@ -35,6 +35,7 @@ def main():
         cotes = getCotes(url)
         listToFile("dataCotations.txt", cotes)
         
+        
 if __name__ == '__main__':
     main()
 
