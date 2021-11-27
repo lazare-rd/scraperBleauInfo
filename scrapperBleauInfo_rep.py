@@ -2,7 +2,6 @@ from typing import overload
 import requests
 import bs4
 import regex as re
-from dataVisualization import fileToList
 import scrapperBleauIInfo_cotations
 import random as ra
 import time
@@ -28,6 +27,7 @@ def getUrlBloc(url):
         listUrl.append(str(re.findall('\/[^\/]+\/[0-9]+\.html', str(item))))
     return list(set(listUrl))
 
+# ATTENTION : Scrapping method !!!
 def getAllUrlBlocs():
     listUrlSecteurs = scrapperBleauIInfo_cotations.fileToList("dataSecteurs.txt")
     for url in listUrlSecteurs:
@@ -35,6 +35,16 @@ def getAllUrlBlocs():
         urlBLocs = getUrlBloc(url)
         scrapperBleauIInfo_cotations.listToFile("dataUrlBlocs.txt", urlBLocs)
 
-getAllUrlBlocs()
+def remplaceData(filePath):
+    urlListe = []
+    file = open(filePath, 'r')
+    for url in file :
+        if url != "\n":
+            urlListe.append(url[:-1])
+    file.close()
+    return urlListe
+
+listeURLBlocs = remplaceData("dataUrlBlocs.txt")
+scrapperBleauIInfo_cotations.listToFile("dataBlocs.txt", listeURLBlocs)
 
 

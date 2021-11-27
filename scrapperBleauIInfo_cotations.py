@@ -4,6 +4,10 @@ import regex as re
 import random as ra
 import time 
 
+##############################################################
+# ATTENTION : Scrapping file !!!
+##############################################################
+
 def fileToList(filePath):
     liste = []
     fichier = open(filePath, 'r')
