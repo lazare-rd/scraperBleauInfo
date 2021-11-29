@@ -7,15 +7,21 @@ import random as ra
 import time
 
 def getNbreRep(url):
+    repete = False
     matching_items = []
     response = requests.get(url)
     responseText = response.text
     soup = bs4.BeautifulSoup(responseText, "html.parser")
-    for item in soup.stripped_strings:
-        if re.match("\([0-9]+ au total\)", item):
-            matching_items.append(item)
-    nbreRep = int(re.findall("[0-9]+" , matching_items[-1])[0])
-    return nbreRep
+    for item in soup.stripped_strings :
+        if re.match("Répétitions publiques", item):
+            repete = True
+    if repete :
+        for item in soup.stripped_strings:
+            if re.match("\([0-9]+ au total\)", item):
+                matching_items.append(item)
+        nbreRep = int(re.findall("[0-9]+" , matching_items[-1])[0])
+        return nbreRep
+    return 0
 
 def getUrlBloc(url):
     listUrl = []
@@ -43,6 +49,7 @@ def remplaceData(filePath):
             urlListe.append(url[:-1])
     file.close()
     return urlListe
+
 
 
 
