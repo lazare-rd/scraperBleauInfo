@@ -23,6 +23,14 @@ def getNbreRep(url):
         return nbreRep
     return 0
 
+def getCoteBlocPage(url):
+    response = requests.get(url)
+    responseText = response.text
+    soup = bs4.BeautifulSoup(responseText, "html.parser")
+    if (len(re.findall('[0-9][abc]?[+-]?' ,str(soup.find('h3'))))>1):
+        return re.findall('[0-9][abc]?[+-]?' ,str(soup.find('h3')))[1]
+    return re.findall('[0-9][abc]?[+-]?' ,str(soup.find('h3')))[0]
+
 def getUrlBloc(url):
     listUrl = []
     response = requests.get(url)
@@ -51,6 +59,9 @@ def remplaceData(filePath):
     return urlListe
 
 
+print(getCoteBlocPage("https://bleau.info/germain/308266.html"))
 
-
-
+# response = requests.get("https://bleau.info/canon/4460.html")
+# responseText = response.text
+# soup = bs4.BeautifulSoup(responseText, "html.parser")
+# print(soup.find('h3'))
