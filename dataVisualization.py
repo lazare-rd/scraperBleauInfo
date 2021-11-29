@@ -1,7 +1,7 @@
 import numpy as np 
 import plotly.graph_objects as plt 
 
-def fileToList(filePath):
+def getDatafromFile(filePath):
     liste = []
     fichier = open(filePath, 'r')
     for line in fichier:
@@ -9,7 +9,7 @@ def fileToList(filePath):
     fichier.close()
     return liste
 
-listeCotations = fileToList("dataCotations.txt")
+listeCotations = getDatafromFile("dataCotations.txt")
 dictCotations = {}
 
 for cote in listeCotations:
