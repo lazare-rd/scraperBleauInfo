@@ -1,8 +1,8 @@
-from typing import overload
 import requests
 import bs4
 import regex as re
-import scrapperBleauIInfo_cotations
+from scrapperBleauIInfo_cotations import listToFile
+from scrapperBleauIInfo_cotations import fileToList
 import random as ra
 import time
 
@@ -29,11 +29,11 @@ def getUrlBloc(url):
 
 # ATTENTION : Scrapping method !!!
 def getAllUrlBlocs():
-    listUrlSecteurs = scrapperBleauIInfo_cotations.fileToList("dataSecteurs.txt")
+    listUrlSecteurs = fileToList("dataSecteurs.txt")
     for url in listUrlSecteurs:
         time.sleep(ra.randrange(1,5))
         urlBLocs = getUrlBloc(url)
-        scrapperBleauIInfo_cotations.listToFile("dataUrlBlocs.txt", urlBLocs)
+        listToFile("dataUrlBlocs.txt", urlBLocs)
 
 def remplaceData(filePath):
     urlListe = []
@@ -44,7 +44,6 @@ def remplaceData(filePath):
     file.close()
     return urlListe
 
-listeURLBlocs = remplaceData("dataUrlBlocs.txt")
-scrapperBleauIInfo_cotations.listToFile("dataBlocs.txt", listeURLBlocs)
+
 
 
