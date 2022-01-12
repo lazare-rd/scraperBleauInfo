@@ -3,13 +3,14 @@ import bs4
 import regex as re
 from scrapperBleauIInfo_cotations import listToFile
 from scrapperBleauIInfo_cotations import fileToList
+from fake_useragent import UserAgent
 import random as ra
 import time
 
-def getNbreRep(url):
+def getNbreRep(url, uA):
     repete = False
     matching_items = []
-    response = requests.get(url)
+    response = requests.get(url, headers = uA)
     responseText = response.text
     soup = bs4.BeautifulSoup(responseText, "html.parser")
     for item in soup.stripped_strings :
@@ -23,8 +24,8 @@ def getNbreRep(url):
         return nbreRep
     return 0
 
-def getCoteBlocPage(url):
-    response = requests.get(url)
+def getCoteBlocPage(url, uA):
+    response = requests.get(url, headers = uA)
     responseText = response.text
     soup = bs4.BeautifulSoup(responseText, "html.parser")
     if (len(re.findall('[0-9][abc]?[+-]?' ,str(soup.find('h3'))))>1):
@@ -58,10 +59,27 @@ def remplaceData(filePath):
     file.close()
     return urlListe
 
+def getAllRepOnAllBlocs(filePath):
+    ua = UserAgent()
+    listUrlBlocs = fileToList("dataUrlBlocs.txt")
+    listRepBlocs = {}
+    for url in listUrlBlocs :
+        time.sleep(ra.randrange(1,5)/100)
+        cot = getCoteBlocPage(url)
+        nbrRep = getNbreRep(url)
 
-print(getCoteBlocPage("https://bleau.info/germain/308266.html"))
 
+def main():
+    ua = UserAgent()
+    print(ua['Internet Explorer'])
+
+if __name__ == '__main__':
+    main()
+    
 # response = requests.get("https://bleau.info/canon/4460.html")
 # responseText = response.text
 # soup = bs4.BeautifulSoup(responseText, "html.parser")
 # print(soup.find('h3'))
+
+headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36"}
+
