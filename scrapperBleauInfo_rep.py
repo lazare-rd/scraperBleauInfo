@@ -1,4 +1,3 @@
-from fake_useragent.fake import UserAgent
 import requests
 import bs4
 import regex as re
@@ -6,6 +5,13 @@ from scrapperBleauIInfo_cotations import listToFile
 from scrapperBleauIInfo_cotations import fileToList
 import random as ra
 import time
+import concurrent.futures
+
+##############################################################
+# ATTENTION : Scrapping file !!!
+##############################################################
+
+MAX_THREADS = 50
 
 fakeUserAgent = [{"User-Agent" : "Mozilla/5.0 (Windows; U; MSIE 9.0; Windows NT 9.0; en-US)"}, 
                 {"User-Agent" : "Mozilla/5.0 (compatible; MSIE 10.0; Macintosh; Intel Mac OS X 10_7_3; Trident/6.0)"},
@@ -35,9 +41,11 @@ def getNbreRep(responseText):
 
 def getCoteBlocPage(responseText):
     soup = bs4.BeautifulSoup(responseText, "html.parser")
-    if (len(re.findall('[0-9][abc]?[+-]?' ,str(soup.find('h3'))))>1):
+    if (len(re.findall('[0-9][abc]?[+-]?' ,str(soup.find('h3'))))>1) :
         return re.findall('[0-9][abc]?[+-]?' ,str(soup.find('h3')))[1]
-    return re.findall('[0-9][abc]?[+-]?' ,str(soup.find('h3')))[0]
+    elif (len(re.findall('[0-9][abc]?[+-]?' ,str(soup.find('h3')))) == 1 ) : 
+        return re.findall('[0-9][abc]?[+-]?' ,str(soup.find('h3')))[0]
+    return "None"
 
 def getUrlBloc(url):
     listUrl = []
@@ -66,11 +74,39 @@ def remplaceData(filePath):
     file.close()
     return urlListe
 
+def getRep(url):
+    listRepBlocs = {}
+    response = requests.get(url, headers=fakeUserAgent[ra.randrange(0, len(fakeUserAgent)-1)])
+    responseText = response.text
+    cot = getCoteBlocPage(responseText)
+    nbrRep = getNbreRep(responseText)
+    if cot in listRepBlocs : 
+        listRepBlocs[cot] += nbrRep
+    else : 
+        listRepBlocs[cot] = nbrRep
+    time.sleep(ra.randrange(1,3)/10)
+    return listRepBlocs
+
+def concatenateDico(iteratorDico):
+    mainDico = {}
+    for dico in iteratorDico : 
+        for key, value in dico.items():
+            if key not in mainDico : 
+                mainDico[key] = value
+            else :
+                mainDico[key] += value
+    return mainDico
+
 def getAllRepOnAllBlocs(filePath):
     listUrlBlocs = fileToList(filePath)
     listRepBlocs = {}
+    threads = min(MAX_THREADS, len(listUrlBlocs))
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=threads) as executor : 
+        iteratorDico = executor.map(getRep, listUrlBlocs)
+    """
     for url in listUrlBlocs :
-        time.sleep(ra.randrange(1,5)/100)
+        time.sleep(ra.randrange(1,3)/10)
         response = requests.get(url, headers=fakeUserAgent[ra.randrange(0, len(fakeUserAgent)-1)])
         responseText = response.text
         cot = getCoteBlocPage(responseText)
@@ -79,6 +115,10 @@ def getAllRepOnAllBlocs(filePath):
             listRepBlocs[cot] += nbrRep
         else : 
             listRepBlocs[cot] = nbrRep
+    """
+
+    listRepBlocs = concatenateDico(iteratorDico)
+
     return listRepBlocs
 
 def dicoToFile(dico, filePath): 
@@ -89,7 +129,10 @@ def dicoToFile(dico, filePath):
 
 
 def main():
-    dicoCotRep = getAllRepOnAllBlocs("dataUrlBlocs.txt")
+    t0 = time.time()
+    dicoCotRep = getAllRepOnAllBlocs("testDataBlocs.txt")
+    t1 = time.time()
+    print(f"All requests took { round(t1-t0, 3) } seconds")
     dicoToFile(dicoCotRep, "finalData.txt")
 
 if __name__ == '__main__':
