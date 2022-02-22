@@ -1,1 +1,4 @@
 trashTest.py
+__pycache__/*
+scrapping/__pycache__/*
+data_management/__pycache__/*

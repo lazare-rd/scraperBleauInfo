@@ -117,7 +117,7 @@ def dicoToFile(dico, filePath):
 
 def main():
     t0 = time.time()
-    dicoCotRep = getAllRepOnAllBlocs("data/testDataBlocs.txt")
+    dicoCotRep = getAllRepOnAllBlocs("data/dataUrlBlocs.txt")
     t1 = time.time()
     print(f"All requests took { round(t1-t0, 3) } seconds")
     dicoToFile(dicoCotRep, "data/finalData.txt")
