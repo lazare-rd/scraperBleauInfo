@@ -11,7 +11,7 @@ import concurrent.futures
 # ATTENTION : Scrapping file !!!
 ##############################################################
 
-MAX_THREADS = 50
+MAX_THREADS = 100
 
 fakeUserAgent = [{"User-Agent" : "Mozilla/5.0 (Windows; U; MSIE 9.0; Windows NT 9.0; en-US)"}, 
                 {"User-Agent" : "Mozilla/5.0 (compatible; MSIE 10.0; Macintosh; Intel Mac OS X 10_7_3; Trident/6.0)"},
@@ -76,15 +76,15 @@ def remplaceData(filePath):
 
 def getRep(url):
     listRepBlocs = {}
-    response = requests.get(url, headers=fakeUserAgent[ra.randrange(0, len(fakeUserAgent)-1)])
-    responseText = response.text
-    cot = getCoteBlocPage(responseText)
-    nbrRep = getNbreRep(responseText)
-    if cot in listRepBlocs : 
-        listRepBlocs[cot] += nbrRep
-    else : 
+    try:
+        response = requests.get(url, headers=fakeUserAgent[ra.randrange(0, len(fakeUserAgent)-1)], timeout=0.7)
+        responseText = response.text
+        cot = getCoteBlocPage(responseText)
+        nbrRep = getNbreRep(responseText)
         listRepBlocs[cot] = nbrRep
-    time.sleep(ra.randrange(1,3)/10)
+        time.sleep(ra.randrange(1,5)/10)
+    except TimeoutError:
+        listRepBlocs["Missed"]=1
     return listRepBlocs
 
 def concatenateDico(iteratorDico):
@@ -104,19 +104,7 @@ def getAllRepOnAllBlocs(filePath):
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=threads) as executor : 
         iteratorDico = executor.map(getRep, listUrlBlocs)
-    """
-    for url in listUrlBlocs :
-        time.sleep(ra.randrange(1,3)/10)
-        response = requests.get(url, headers=fakeUserAgent[ra.randrange(0, len(fakeUserAgent)-1)])
-        responseText = response.text
-        cot = getCoteBlocPage(responseText)
-        nbrRep = getNbreRep(responseText)
-        if cot in listRepBlocs : 
-            listRepBlocs[cot] += nbrRep
-        else : 
-            listRepBlocs[cot] = nbrRep
-    """
-
+   
     listRepBlocs = concatenateDico(iteratorDico)
 
     return listRepBlocs
