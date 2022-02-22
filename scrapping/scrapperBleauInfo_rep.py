@@ -1,3 +1,4 @@
+import requests.exceptions as requestExcep
 import requests
 import bs4
 import regex as re
@@ -75,26 +76,24 @@ def remplaceData(filePath):
     return urlListe
 
 def getRep(url):
-    listRepBlocs = {}
     try:
-        response = requests.get(url, headers=fakeUserAgent[ra.randrange(0, len(fakeUserAgent)-1)], timeout=0.7)
+        response = requests.get(url, headers=fakeUserAgent[ra.randrange(0, len(fakeUserAgent)-1)], timeout=5)
         responseText = response.text
         cot = getCoteBlocPage(responseText)
         nbrRep = getNbreRep(responseText)
-        listRepBlocs[cot] = nbrRep
+        listRepBlocs = (cot, nbrRep)
         time.sleep(ra.randrange(1,5)/10)
-    except TimeoutError:
-        listRepBlocs["Missed"]=1
+    except requestExcep.Timeout :
+        listRepBlocs = ("Missed", 1)
     return listRepBlocs
 
-def concatenateDico(iteratorDico):
+def concatenateTuples(iteratorTuples):
     mainDico = {}
-    for dico in iteratorDico : 
-        for key, value in dico.items():
-            if key not in mainDico : 
-                mainDico[key] = value
-            else :
-                mainDico[key] += value
+    for tup in iteratorTuples : 
+        if tup[0] not in mainDico : 
+            mainDico[tup[0]] = tup[1]
+        else :
+            mainDico[tup[0]] += tup[1]
     return mainDico
 
 def getAllRepOnAllBlocs(filePath):
@@ -105,7 +104,7 @@ def getAllRepOnAllBlocs(filePath):
     with concurrent.futures.ThreadPoolExecutor(max_workers=threads) as executor : 
         iteratorDico = executor.map(getRep, listUrlBlocs)
    
-    listRepBlocs = concatenateDico(iteratorDico)
+    listRepBlocs = concatenateTuples(iteratorDico)
 
     return listRepBlocs
 
@@ -118,10 +117,10 @@ def dicoToFile(dico, filePath):
 
 def main():
     t0 = time.time()
-    dicoCotRep = getAllRepOnAllBlocs("testDataBlocs.txt")
+    dicoCotRep = getAllRepOnAllBlocs("data/testDataBlocs.txt")
     t1 = time.time()
     print(f"All requests took { round(t1-t0, 3) } seconds")
-    dicoToFile(dicoCotRep, "finalData.txt")
+    dicoToFile(dicoCotRep, "data/finalData.txt")
 
 if __name__ == '__main__':
     main()
