@@ -37,8 +37,19 @@ def fileToDico(filePath):
 dictRep_pre = fileToDico("data/dataRepCot.txt")
 dictRep = {}
 
-for k in sorted(dictRep_pre.keys()):
-    dictRep[k] = dictRep_pre[k]
+def getSumReps(dico):
+    somme = 0
+    for v in dico.values() : 
+        somme += v
+    return somme
+
+def sortDico(dico):
+    sortedDico = {}
+    for k in sorted(dico.keys()):
+        sortedDico[k] = dico[k]
+    return sortedDico
+
+dictRep = sortDico(dictRep_pre)
 
 fig = plt.Figure(data=[plt.Pie(labels=list(dictRep.keys()), values=list(dictRep.values()), textinfo='label+percent')])
 fig.show()
