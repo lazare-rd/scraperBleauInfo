@@ -82,8 +82,8 @@ def getRep(url):
         cot = getCoteBlocPage(responseText)
         nbrRep = getNbreRep(responseText)
         listRepBlocs = (cot, nbrRep)
-        time.sleep(ra.randrange(1,5)/10)
-    except requestExcep.Timeout :
+        time.sleep(ra.randrange(3,7)/10)
+    except (requestExcep.Timeout, requestExcep.ConnectionError) :
         listRepBlocs = ("Missed", 1)
     return listRepBlocs
 
