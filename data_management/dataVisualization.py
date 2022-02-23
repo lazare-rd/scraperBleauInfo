@@ -9,16 +9,36 @@ def getDatafromFile(filePath):
     fichier.close()
     return liste
 
-listeCotations = getDatafromFile("dataCotations.txt")
-dictCotations = {}
+def fileToDico(filePath):
+    dico = {}
+    dico["Autre"]=0
+    fichier = open(filePath, 'r')
+    for line in fichier :
+        splittedLine = line.split(",") 
+        if splittedLine[0] != "Missed" :
+            if int(splittedLine[0][0]) >= 6 :
+                dico[splittedLine[0]] = int(splittedLine[1])
+            else :
+                dico["Autre"] += int(splittedLine[1])
+    fichier.close()
+    return dico
 
-for cote in listeCotations:
-    if cote in dictCotations:
-        dictCotations[cote]+=1
-    else:
-        dictCotations[cote]=1
+# listeCotations = getDatafromFile("data/dataCotations.txt")
+# dictCotations = {}
 
-dictCotations["9a"]=2
+# for cote in listeCotations:
+#     if cote in dictCotations:
+#         dictCotations[cote]+=1
+#     else:
+#         dictCotations[cote]=1
 
-fig = plt.Figure(data=[plt.Pie(labels=list(dictCotations.keys()), values=list(dictCotations.values()), textinfo='label+percent')])
+# dictCotations["9a"]=2
+
+dictRep_pre = fileToDico("data/dataRepCot.txt")
+dictRep = {}
+
+for k in sorted(dictRep_pre.keys()):
+    dictRep[k] = dictRep_pre[k]
+
+fig = plt.Figure(data=[plt.Pie(labels=list(dictRep.keys()), values=list(dictRep.values()), textinfo='label+percent')])
 fig.show()
